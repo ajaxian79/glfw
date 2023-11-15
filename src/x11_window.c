@@ -626,6 +626,9 @@ static GLFWbool createNativeWindow(_GLFWwindow* window,
     if (!wndconfig->decorated)
         _glfwSetWindowDecoratedX11(window, GLFW_FALSE);
 
+    if (!wndconfig->titlebar)
+        _glfwSetWindowTitlebarX11(window, GLFW_FALSE);
+
     if (_glfw.x11.NET_WM_STATE && !window->monitor)
     {
         Atom states[3];
@@ -2606,11 +2609,26 @@ void _glfwSetWindowDecoratedX11(_GLFWwindow* window, GLFWbool enabled)
                     sizeof(hints) / sizeof(long));
 }
 
-void _glfwPlatformSetWindowTitlebar(_GLFWwindow* window, GLFWbool enabled)
+void _glfwSetWindowTitlebarX11(_GLFWwindow* window, GLFWbool enabled)
 {
-    // TODO
-    _glfwInputError(GLFW_PLATFORM_ERROR,
-        "X11: Window attribute setting not implemented yet");
+    struct
+    {
+        unsigned long flags;
+        unsigned long functions;
+        unsigned long decorations;
+        long input_mode;
+        unsigned long status;
+    } hints = {0};
+
+    hints.flags = MWM_HINTS_DECORATIONS;
+    hints.decorations = enabled ? MWM_DECOR_ALL : 0;
+
+    XChangeProperty(_glfw.x11.display, window->x11.handle,
+                    _glfw.x11.MOTIF_WM_HINTS,
+                    _glfw.x11.MOTIF_WM_HINTS, 32,
+                    PropModeReplace,
+                    (unsigned char*) &hints,
+                    sizeof(hints) / sizeof(long));
 }
 
 void _glfwSetWindowFloatingX11(_GLFWwindow* window, GLFWbool enabled)
@@ -2763,6 +2781,22 @@ void _glfwPollEventsX11(void)
     {
         XEvent event;
         XNextEvent(_glfw.x11.display, &event);
+
+        switch (event.type) {
+            case ButtonPress:
+                printf("ButtonPress: %d, %d\n", event.xbutton.x, event.xbutton.y);
+                break;
+            case ButtonRelease:
+                printf("ButtonRelease: %d, %d\n", event.xbutton.x, event.xbutton.y);
+                if (event.xbutton.x > 0 && event.xbutton.x < 20) {
+                    XMoveWindow(_glfw.x11.display, event.xbutton.window, 0, 0);
+                }
+                break;
+            case MotionNotify:
+                printf("MotionNotify: %d, %d\n", event.xmotion.x, event.xmotion.y);
+                break;
+        }
+
         processEvent(&event);
     }
 

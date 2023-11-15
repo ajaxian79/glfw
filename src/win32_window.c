@@ -86,8 +86,7 @@ static const GLFWimage* chooseImage(int count, const GLFWimage* images,
     {
         const int currDiff = abs(images[i].width * images[i].height -
                                  width * height);
-        if (currDiff < leastDiff)
-        {
+        if (currDiff < leastDiff
             closest = images + i;
             leastDiff = currDiff;
         }

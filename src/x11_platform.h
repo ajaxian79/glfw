@@ -927,6 +927,7 @@ int _glfwWindowHoveredX11(_GLFWwindow* window);
 int _glfwFramebufferTransparentX11(_GLFWwindow* window);
 void _glfwSetWindowResizableX11(_GLFWwindow* window, GLFWbool enabled);
 void _glfwSetWindowDecoratedX11(_GLFWwindow* window, GLFWbool enabled);
+void _glfwSetWindowTitlebarX11(_GLFWwindow* window, GLFWbool enabled);
 void _glfwSetWindowFloatingX11(_GLFWwindow* window, GLFWbool enabled);
 float _glfwGetWindowOpacityX11(_GLFWwindow* window);
 void _glfwSetWindowOpacityX11(_GLFWwindow* window, float opacity);
